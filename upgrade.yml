@@ -9,13 +9,11 @@
 
   - name: ensure httpd is installed
     dnf:
-      name: httpd
+      name:
+        - httpd
+        - php
       state: present
-
-  - name: ensure php is installed
-    dnf:
-      name: php
-      state: present
+    when: ansible_distribution == "CentOS"
 
  # - name: Ensure system is upgraded 
  #   dnf:
