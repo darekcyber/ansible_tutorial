@@ -1,25 +1,39 @@
----
+--- 
 - hosts: all
   become: yes
   pre_tasks:
-  - name: Update reposiroty index
+
+  - name: Update reposiroty index (Centos)
     dnf:
       update_only: yes
       update_cache: yes
     when: ansible_distribution == "CentOS"
 
+  - name: update repository index (Ubuntu)
+    apt:
+      upgrade: dist
+      update_cache: yes
+    when: ansible_distribution == "Ubuntu"
+
 - hosts: all
   become: true
   tasks:
-  - name: ensure httpd is installed
+
+  - name: ensure httpd is installed (Centos)
     dnf:
       name:
         - httpd
         - php
-      state: present
+      state: latest
     when: ansible_distribution == "CentOS"
 
-
+  - name: ensure httpd is installed (Ubuntu)
+    apt:
+      name:
+        - apache2
+        - libapache2-mod-php
+      state: latest
+    when: ansible_distribution == "Ubuntu"
  # - name: Ensure system is upgraded 
  #   dnf:
  #     name: "*"
