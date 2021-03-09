@@ -4,12 +4,14 @@
   pre_tasks:
 
   - name: Update reposiroty index (Centos)
+    tags: always
     dnf:
       update_only: yes
       update_cache: yes
     when: ansible_distribution == "CentOS"
 
   - name: update repository index (Ubuntu)
+    tags: always
     apt:
       upgrade: dist
       update_cache: yes
@@ -20,6 +22,7 @@
   tasks:
 
   - name: ensure httpd is installed (Centos)
+    tags: apache, apache2, ubuntu
     dnf:
       name:
         - httpd
@@ -28,12 +31,38 @@
     when: ansible_distribution == "CentOS"
 
   - name: ensure httpd is installed (Ubuntu)
+    tags: apache, apache2, ubuntu
     apt:
       name:
         - apache2
         - libapache2-mod-php
       state: latest
     when: ansible_distribution == "Ubuntu"
+
+  - name: ensure mariadb is installed (Centos)
+    tags: mariadb, centos, db
+    dnf:
+      name: mariadb
+      state: latest
+    when: ansible_distribution == "CentOS"
+
+  - name: ensure mariadb is installed (Ubuntu)
+    tags: mariadb, ubuntu, db
+    apt:
+      name: mariadb-server
+      state: latest
+    when: ansible_distribution == "Ubuntu"
+
+- hosts: file_servers
+  become: true
+  tasks:
+
+  - name: install samba package
+    tags: samba
+    package:
+      name: samba
+      state: latest
+
  # - name: Ensure system is upgraded 
  #   dnf:
  #     name: "*"
