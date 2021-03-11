@@ -1,0 +1,47 @@
+---
+- hosts: all
+  become: true
+  tasks:
+
+    - name: install updates (Centos)
+      tags: always
+      dnf:
+        update_only: yes
+        update_cache: yes
+      when: ansible_distribution == "CentOS"
+
+    - name: install updates 9Ubuntu)
+      tags: always
+      apt:
+        upgrade: dist
+        update_cache: yes
+      when: ansible_distribution == "Ubuntu"
+
+    - name: create ansible_users group
+      tags: always
+      group:
+        name: ansible_users
+        state: present
+
+    - name: create radek user
+      tags: always
+      user:
+        name: radek
+        group: ansible_users
+
+    - name: add ssh key for radek
+      tags: always
+      authorized_key:
+        user: radek
+        key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGUYrtEuXqfI3ZgSbRs1IwT/9oPLj/YC/A6wJytcajsv ansible"
+
+    - name: add sudoer file for radek
+      tags: always
+      copy:
+        src: radek
+        dest: /etc/sudoers.d/radek
+        owner: root
+        group: root
+        mode: 0440
+        
+   

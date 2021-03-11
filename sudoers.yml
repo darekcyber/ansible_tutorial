@@ -1,0 +1,12 @@
+---
+- hosts: ubuntu
+  become: yes
+  tasks:
+
+  - name: ensure sudoers file is copied
+    lineinfile:
+      path: /etc/sudoers.d/darek
+      line: 'darek ALL=(ALL) NOPASSWD: ALL'
+      state: present
+      mode: 0400
+      create: yes
