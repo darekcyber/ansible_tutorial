@@ -1,0 +1,7 @@
+- name: add ssh key for radek
+  authorized_key:
+    user: radek
+    key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGUYrtEuXqfI3ZgSbRs1IwT/9oPLj/YC/A6wJytcajsv ansible"
+
+
+

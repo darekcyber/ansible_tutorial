@@ -1,0 +1,60 @@
+
+
+- name: ensure httpd is installed (Centos)
+  dnf:
+    name:
+      - httpd
+      - php
+      - mod_ssl
+    state: latest
+  when: ansible_distribution == "CentOS"
+
+- name: ensure httpd is installed (Ubuntu)
+  apt:
+    name:
+      - apache2
+      - libapache2-mod-php
+    state: latest
+  when: ansible_distribution == "Ubuntu"
+
+
+- name: ensure port 80 is open
+  ansible.posix.firewalld:
+    port: "{{ item }}"
+    permanent: yes
+    state: enabled
+  with_items:
+    - 80/tcp
+    - 443/tcp
+  when: ansible_distribution == "CentOS"
+
+- name: ensure firewalld is reload
+  service:
+    name: firewalld
+    state: reloaded
+  when: ansible_distribution == "CentOS"
+
+- name: change e-mail address from admin
+  lineinfile:
+    path: /etc/httpd/conf/httpd.conf
+    regexp: '^ServerAdmin'
+    line: ServerAdmin darek@darek.net
+  when: ansible_distribution == "CentOS"
+  register: httpd
+
+- name: ensure httpd is running (CentOS)
+  ansible.builtin.service:
+    name: httpd
+    state: restarted
+    enabled: yes
+  when: ansible_distribution == "CentOS"
+#    when: httpd.changed
+
+- name: copy default html file for site
+  copy:
+    src: default_site.html
+    dest: /var/www/html/index.html
+    owner: root
+    group: root
+    mode: 0644
+
