@@ -1,22 +1,17 @@
-
-
-- name: ensure httpd is installed (Centos)
-  dnf:
+- name: ensure apacje and php packages are installed
+  tags: apache, httpd, php
+  package:
     name:
-      - httpd
-      - php
-      - mod_ssl
+      - "{{ apache_package_name }}"
+      - "{{ php_package_name }}"
     state: latest
-  when: ansible_distribution == "CentOS"
 
-- name: ensure httpd is installed (Ubuntu)
-  apt:
-    name:
-      - apache2
-      - libapache2-mod-php
-    state: latest
-  when: ansible_distribution == "Ubuntu"
-
+- name: ensure apache is started and enabled
+  tags: apache, httpd
+  service:
+    name: "{{ apache_service }}"
+    state: started
+    enabled: yes
 
 - name: ensure port 80 is open
   ansible.posix.firewalld:
@@ -42,13 +37,12 @@
   when: ansible_distribution == "CentOS"
   register: httpd
 
-- name: ensure httpd is running (CentOS)
-  ansible.builtin.service:
-    name: httpd
+- name: ensure httpd is restarted
+  tags: apache, httpd
+  service:
+    name: "{{ apache_service }}"
     state: restarted
-    enabled: yes
-  when: ansible_distribution == "CentOS"
-#    when: httpd.changed
+  when: httpd.changed
 
 - name: copy default html file for site
   copy:
